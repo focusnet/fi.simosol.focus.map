@@ -19,17 +19,17 @@ function loadRootData(url) {
 
     var xmlhttp = new XMLHttpRequest();
 
-    xmlhttp.onreadystatechange = function () {
+    xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 
             if (xmlhttp.response) {
 
                 rootdata = new FocusRootData();
                 rootdata.fromJSON(JSON.parse(xmlhttp.responseText));
-                rootdata.loadProjects().then(function (result) {
+                rootdata.loadProjects().then(function(result) {
                     console.log(result); // "Stuff worked!"
                     me.initmap();
-                }, function (err) {
+                }, function(err) {
                     console.log(err); // Error: "It broke"
                 });
             }
@@ -48,7 +48,7 @@ function onLoadProjects() {
 function loadStand(url) {
     var standrequest = new XMLHttpRequest();
 
-    standrequest.onreadystatechange = function () {
+    standrequest.onreadystatechange = function() {
         if (standrequest.readyState == 4 && standrequest.status == 200) {
             var stand = factory.createStandData(JSON.parse(standrequest.responseText));
             console.log("%o", stand);
@@ -65,7 +65,9 @@ function initmap() {
     console.log("initmap");
 
     // set up the map
-    map = new L.Map('map', {attributionControl: false});
+    map = new L.Map('map', {
+        attributionControl: false
+    });
 
     var shapeOptions = {
         stroke: true,
@@ -80,7 +82,10 @@ function initmap() {
 
     // create the openstreetmap tile layer
     var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-    var osm = new L.TileLayer(osmUrl, {minZoom: 5, maxZoom: 18});
+    var osm = new L.TileLayer(osmUrl, {
+        minZoom: 5,
+        maxZoom: 18
+    });
 
     // start the map in South-East England
 
@@ -114,7 +119,7 @@ function initmap() {
     });
     map.addControl(drawControl);
 
-    map.on('draw:created', function (e) {
+    map.on('draw:created', function(e) {
         var type = e.layerType,
             layer = e.layer;
 
@@ -123,22 +128,22 @@ function initmap() {
     });
 
     // in here you do whatever you want with the split output
-    map.on('merge:created', function (e) {
+    map.on('merge:created', function(e) {
         if (e.merge) {
             var result = e.merge;
-            result.eachLayer(function (layer) {
+            result.eachLayer(function(layer) {
                 drawnItems.addLayer(layer);
             });
         }
     });
 
     // in here you do whatever you want with merge output
-    map.on('split:created', function (e) {
+    map.on('split:created', function(e) {
         if (e.created) {
             var result = e.created;
-            result.eachLayer(function (layer) {
+            result.eachLayer(function(layer) {
                 console.log(layer);
-                layer.eachLayer(function (sublayer) {
+                layer.eachLayer(function(sublayer) {
                     sublayer.setStyle(shapeOptions);
                     drawnItems.addLayer(sublayer);
                 })
