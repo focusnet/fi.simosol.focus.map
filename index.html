@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="extend.min.js"></script>
+
+    <script src="focusdata.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="leaflet/leaflet.css"/>
+
+    <!-- custom leaflet.draw styling :: adds merge and split gfx -->
+    <link rel="stylesheet" type="text/css" href="leaflet-draw/leaflet.draw-simosol.css"/>
+
+    <script src="turf/turf.min.js" charset="utf-8"></script>
+
+    <script src="leaflet/leaflet.js"></script>
+
+    <script src="proj4-compressed.js"></script>
+
+    <script src="proj4leaflet.js"></script>
+
+    <!-- custom leaflet.draw :: adds merge and split to toolbar -->
+    <script src="leaflet-draw/leaflet.draw-simosol.js"></script>
+
+    <!-- custom polygon split tool for leaflet.draw -->
+    <script src="EditToolbar.Split.js" charset="utf-8"></script>
+
+    <!-- custom polygon merge tool for leaflet.draw -->
+    <script src="EditToolbar.Merge.js" charset="utf-8"></script>
+
+    <script src="index.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+</head>
+
+<body onload="init('https://core.focusnet.eu:21223/forest')">
+
+<div id="map"></div>
+
+</body>
+</html>
