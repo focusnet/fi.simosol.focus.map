@@ -15,9 +15,7 @@ function init(context) {
 function loadRootData(url) {
     console.log("load data");
 
-    var me = this;
-
-    var xmlhttp = new XMLHttpRequest();
+    var me = this, xmlhttp = new XMLHttpRequest();
 
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -39,10 +37,6 @@ function loadRootData(url) {
     xmlhttp.open("GET", url, true);
     xmlhttp.setRequestHeader("FOCUS-FOREST-API-KEY", apikey);
     xmlhttp.send();
-}
-
-function onLoadProjects() {
-    console.log("onLoadProjects");
 }
 
 function loadStand(url) {
