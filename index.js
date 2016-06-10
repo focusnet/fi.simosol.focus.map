@@ -12,6 +12,21 @@ function init(context) {
     }
 }
 
+// Do we run the webbapp from FOCUS, or do we want to display a demo in the browser?
+if(window.FocusApp) {
+     var header = FocusApp.getAccessControlToken('core.focusnet.eu');
+     var match = /^[^:]+:\s*(.+)$/.exec(header);
+     apikey = match[1];
+     window.FocusApp.init = init;
+}
+else {
+     document.addEventListener("DOMContentLoaded", function(event) {
+         var context = document.getElementsByTagName("body")[0].getAttribute("data-context");
+         apikey = document.getElementsByTagName("body")[0].getAttribute("data-api-key");
+         init(context);
+        });
+}
+
 function loadRootData(url) {
     console.log("load data");
 
