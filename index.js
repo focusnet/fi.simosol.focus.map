@@ -7,7 +7,8 @@ function init(context) {
 
     if (!apikey) {
         window.alert("You must provide apikey within the code!");
-    } else {
+    }
+    else {
         loadRootData(context);
     }
 }
@@ -50,6 +51,7 @@ function loadRootData(url) {
     };
 
     xmlhttp.open("GET", url, true);
+    xmlhttp.setRequestHeader(apikey, "FOCUS-FOREST-API-KEY");
     xmlhttp.setRequestHeader("FOCUS-FOREST-API-KEY", apikey);
     xmlhttp.send();
 }

@@ -189,6 +189,7 @@ var FocusRootData = FocusData.extend(function() {
             };
 
             xmlhttp.open("GET", url, true);
+            xmlhttp.setRequestHeader(apikey, "FOCUS-FOREST-API-KEY");
             xmlhttp.setRequestHeader("FOCUS-FOREST-API-KEY", apikey);
             xmlhttp.send();
         });
@@ -260,6 +261,7 @@ var FocusProjectData = FocusData.extend(function() {
                 }
             };
             xmlhttp.open("GET", url, true);
+            xmlhttp.setRequestHeader(apikey, "FOCUS-FOREST-API-KEY");
             xmlhttp.setRequestHeader("FOCUS-FOREST-API-KEY", apikey);
             xmlhttp.send();
         });
