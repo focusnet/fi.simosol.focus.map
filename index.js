@@ -9,7 +9,6 @@ function init(context) {
         window.alert("You must provide apikey within the code!");
     }
     else {
-        //loadRootData(context);
         loadData(context);
     }
 }
