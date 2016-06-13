@@ -90,36 +90,11 @@ function initmap(datatype) {
     });
 
     // start the map in South-East England
-
     map.setView([51.505, -0.09], 8);
     map.addLayer(osm);
 
     var drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
-
-    L.drawLocal.draw.toolbar.buttons.polygon = 'Draw a sexy polygon!';
-
-    var drawControl = new L.Control.Draw({
-        position: 'topright',
-        draw: {
-            marker: false,
-            circle: false,
-            polygon: {
-                allowIntersection: false,
-                showArea: true,
-                drawError: {
-                    color: '#b00b00',
-                    timeout: 1000
-                }
-            }
-        },
-        edit: {
-            edit: false,
-            featureGroup: drawnItems,
-            remove: true
-        }
-    });
-    map.addControl(drawControl);
 
     map.on('draw:created', function (e) {
         var type = e.layerType,
@@ -154,6 +129,27 @@ function initmap(datatype) {
     });
 
 
+    var drawOptions = {
+        position: 'topright',
+        draw: {
+            marker: false,
+            circle: false,
+            polygon: {
+                allowIntersection: false,
+                showArea: true,
+                drawError: {
+                    color: '#b00b00',
+                    timeout: 1000
+                }
+            }
+        },
+        edit: {
+            edit: false,
+            featureGroup: drawnItems,
+            remove: true
+        }
+    };
+
     switch (datatype) {
         case "forest":
             var projects = me.data.getProjects();
@@ -174,6 +170,7 @@ function initmap(datatype) {
             }
             break;
         case "forest_data":
+            drawOptions.edit.merge = drawOptions.edit.split = true;
             var stands = me.data.getStands();
             for (var s = 0; s < stands.length; ++s) {
                 var stand = stands[s];
@@ -187,6 +184,7 @@ function initmap(datatype) {
             }
             break;
         case "stand":
+            drawOptions.edit = false;
             var stand = me.data;
             var geojson = stand.getGeoJSON();
 
@@ -200,6 +198,9 @@ function initmap(datatype) {
     }
 
     map.fitBounds(drawnItems.getBounds());
+
+    var drawControl = new L.Control.Draw(drawOptions);
+    map.addControl(drawControl);
 }
 
 function createPopUp(data) {

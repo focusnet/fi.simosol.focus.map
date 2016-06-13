@@ -2826,14 +2826,14 @@ L.EditToolbar = L.Toolbar.extend({
 				title: L.drawLocal.edit.toolbar.buttons.remove
 			},
 			{
-				enabled: true,
+				enabled: this.options.split,
 				handler: new L.EditToolbar.Split(map, {
 					featureGroup: featureGroup
 				}),
 				title: 'Split polygon'
 			},
 			{
-				enabled: true,
+				enabled: this.options.merge,
 				handler: new L.EditToolbar.Merge(map, {
 					featureGroup: featureGroup,
 					selectedPathOptions: this.options.edit.selectedPathOptions
