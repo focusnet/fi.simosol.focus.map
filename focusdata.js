@@ -1,4 +1,14 @@
-var FocusData = Class.extend(function() {
+createRequest = function (url) {
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.open("GET", url, true);
+    xmlhttp.setRequestHeader(apikey, "FOCUS-FOREST-API-KEY");
+    xmlhttp.setRequestHeader("FOCUS-FOREST-API-KEY", apikey);
+
+    return xmlhttp;
+};
+
+var FocusData = Class.extend(function () {
 
     var type = null;
     var url = null;
@@ -10,79 +20,79 @@ var FocusData = Class.extend(function() {
     var active = null;
     var data = null;
 
-    this.getType = function() {
+    this.getType = function () {
         return type;
     };
 
-    this.setType = function(value) {
+    this.setType = function (value) {
         type = value;
     };
 
-    this.getURL = function() {
+    this.getURL = function () {
         return url;
     };
 
-    this.setURL = function(value) {
+    this.setURL = function (value) {
         url = value;
     };
 
-    this.getVersion = function() {
+    this.getVersion = function () {
         return version;
     };
 
-    this.setVersion = function(value) {
+    this.setVersion = function (value) {
         version = value;
     };
 
-    this.getOwner = function() {
+    this.getOwner = function () {
         return owner;
     };
 
-    this.setOwner = function(value) {
+    this.setOwner = function (value) {
         owner = value;
     };
 
-    this.getCreationDateTime = function() {
+    this.getCreationDateTime = function () {
         return creationDateTime;
     };
 
-    this.setCreationDateTime = function(value) {
+    this.setCreationDateTime = function (value) {
         creationDateTime = value;
     };
 
-    this.getEditor = function() {
+    this.getEditor = function () {
         return editor;
     };
 
-    this.setEditor = function(value) {
+    this.setEditor = function (value) {
         editor = value;
     };
 
-    this.getEditionDateTime = function() {
+    this.getEditionDateTime = function () {
         return editionDateTime;
     };
 
-    this.setEditionDateTime = function(value) {
+    this.setEditionDateTime = function (value) {
         editionDateTime = value;
     };
 
-    this.getActive = function() {
+    this.getActive = function () {
         return active;
     };
 
-    this.setActive = function(value) {
+    this.setActive = function (value) {
         active = value;
     };
 
-    this.getData = function() {
+    this.getData = function () {
         return data;
     };
 
-    this.setData = function(value) {
+    this.setData = function (value) {
         data = value;
     };
 
-    this.fromJSON = function(json) {
+    this.fromJSON = function (json) {
         try {
             if (json.hasOwnProperty('active')) {
                 this.setActive(json.active);
@@ -125,24 +135,52 @@ var FocusData = Class.extend(function() {
     }
 });
 
-var FocusRootData = FocusData.extend(function() {
+var FocusRootData = FocusData.extend(function () {
 
     var projects = [];
 
-    this.getProjects = function() {
+    this.getProjects = function () {
         return projects;
     };
 
-    this.setProejcts = function(value) {
+    this.setProjects = function (value) {
         projects = value;
     };
 
-    this.loadProjects = function() {
+    this.load = function (url) {
+
+        var me = this;
+
+        return new Promise(function (resolve, reject) {
+
+            var xmlhttp = createRequest(url);
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+                    if (xmlhttp.response) {
+                        me.fromJSON(JSON.parse(xmlhttp.responseText));
+                        me.loadProjects().then(function (result) {
+                            console.log(result);
+                            resolve("all done");
+                        }, function (err) {
+                            console.log(err);
+                        });
+                    }
+                }
+            };
+
+            xmlhttp.send();
+
+        });
+    };
+
+    this.loadProjects = function () {
         console.log("loadProjects");
         var me = this,
             queueDone = 0;
 
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             var data = me.getData();
 
             if (data.hasOwnProperty('project_urls')) {
@@ -152,7 +190,7 @@ var FocusRootData = FocusData.extend(function() {
 
                 for (var i = 0; i < projectURLs.length; ++i) {
                     var url = projectURLs[i];
-                    loadProject(url).then(function(content) {
+                    loadProject(url).then(function (content) {
                         projects.push(content);
                         queueDone++;
 
@@ -170,17 +208,17 @@ var FocusRootData = FocusData.extend(function() {
 
         var me = this;
 
-        return new Promise(function(resolve, reject) {
-            var xmlhttp = new XMLHttpRequest();
+        return new Promise(function (resolve, reject) {
+            var xmlhttp = createRequest(url);
 
-            xmlhttp.onreadystatechange = function() {
+            xmlhttp.onreadystatechange = function () {
                 if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 
                     if (xmlhttp.response) {
                         var project = new FocusProjectData();
                         project.fromJSON(JSON.parse(xmlhttp.responseText));
 
-                        project.loadStands().then(function(content) {
+                        project.loadStands().then(function (content) {
                             console.log(content);
                             resolve(project);
                         })
@@ -188,31 +226,56 @@ var FocusRootData = FocusData.extend(function() {
                 }
             };
 
-            xmlhttp.open("GET", url, true);
-            xmlhttp.setRequestHeader(apikey, "FOCUS-FOREST-API-KEY");
-            xmlhttp.setRequestHeader("FOCUS-FOREST-API-KEY", apikey);
             xmlhttp.send();
         });
     }
 });
 
-var FocusProjectData = FocusData.extend(function() {
+var FocusProjectData = FocusData.extend(function () {
     var stands = [];
 
-    this.getStands = function() {
+    this.getStands = function () {
         return stands;
     };
 
-    this.setStands = function(value) {
+    this.setStands = function (value) {
         stands = value;
     };
 
-    this.loadStands = function() {
+    this.load = function (url) {
+
+        var me = this;
+
+        return new Promise(function (resolve, reject) {
+
+            var xmlhttp = createRequest(url);
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+                    if (xmlhttp.response) {
+                        me.fromJSON(JSON.parse(xmlhttp.responseText));
+                        me.loadStands().then(function (result) {
+                            console.log(result);
+                            resolve("all done");
+                        }, function (err) {
+                            console.log(err);
+                        });
+                    }
+                }
+            };
+
+            xmlhttp.send();
+
+        });
+    };
+
+    this.loadStands = function () {
         console.log("loadStands");
         var me = this,
             queueDone = 0;
 
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             var data = me.getData();
 
             if (data.hasOwnProperty('stands_urls')) {
@@ -222,7 +285,7 @@ var FocusProjectData = FocusData.extend(function() {
 
                 for (var i = 0; i < standURLs.length; ++i) {
                     var url = standURLs[i];
-                    loadStand(url).then(function(content) {
+                    loadStand(url).then(function (content) {
                         if (content != null) {
                             stands.push(content);
                         }
@@ -242,10 +305,10 @@ var FocusProjectData = FocusData.extend(function() {
 
         var me = this;
 
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             var xmlhttp = new XMLHttpRequest();
 
-            xmlhttp.onreadystatechange = function() {
+            xmlhttp.onreadystatechange = function () {
                 if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 
                     if (xmlhttp.response) {
@@ -268,10 +331,10 @@ var FocusProjectData = FocusData.extend(function() {
     }
 });
 
-var FocusStandData = FocusData.extend(function() {
+var FocusStandData = FocusData.extend(function () {
     var me = this;
 
-    this.getGeoJSON = function() {
+    this.getGeoJSON = function () {
         var data = me.getData();
 
         if (data && data.hasOwnProperty('geojson')) {
@@ -280,5 +343,28 @@ var FocusStandData = FocusData.extend(function() {
         } else {
             return null;
         }
+    };
+
+    this.load = function (url) {
+
+        var me = this;
+
+        return new Promise(function (resolve, reject) {
+
+            var xmlhttp = createRequest(url);
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+                    if (xmlhttp.response) {
+                        me.fromJSON(JSON.parse(xmlhttp.responseText));
+                        resolve("done");
+                    }
+                }
+            };
+
+            xmlhttp.send();
+
+        });
     };
 });

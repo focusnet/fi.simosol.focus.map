@@ -1,6 +1,6 @@
 var map;
-var rootdata;
-var apikey = "";
+var data;
+var apikey;
 
 function init(context) {
     console.log("init :: %o", context);
@@ -9,71 +9,63 @@ function init(context) {
         window.alert("You must provide apikey within the code!");
     }
     else {
-        loadRootData(context);
+        //loadRootData(context);
+        loadData(context);
     }
 }
 
 // Do we run the webbapp from FOCUS, or do we want to display a demo in the browser?
-if(window.FocusApp) {
-     var header = FocusApp.getAccessControlToken('core.focusnet.eu');
-     var match = /^[^:]+:\s*(.+)$/.exec(header);
-     apikey = match[1];
-     window.FocusApp.init = init;
-}
-else {
-     document.addEventListener("DOMContentLoaded", function(event) {
-         var context = document.getElementsByTagName("body")[0].getAttribute("data-context");
-         apikey = document.getElementsByTagName("body")[0].getAttribute("data-api-key");
-         init(context);
-        });
-}
-
-function loadRootData(url) {
-    console.log("load data");
-
-    var me = this, xmlhttp = new XMLHttpRequest();
-
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-
-            if (xmlhttp.response) {
-
-                rootdata = new FocusRootData();
-                rootdata.fromJSON(JSON.parse(xmlhttp.responseText));
-                rootdata.loadProjects().then(function(result) {
-                    console.log(result); // "Stuff worked!"
-                    me.initmap();
-                }, function(err) {
-                    console.log(err); // Error: "It broke"
-                });
-            }
-        }
-    };
-
-    xmlhttp.open("GET", url, true);
-    xmlhttp.setRequestHeader(apikey, "FOCUS-FOREST-API-KEY");
-    xmlhttp.setRequestHeader("FOCUS-FOREST-API-KEY", apikey);
-    xmlhttp.send();
+if (window.FocusApp) {
+    var header = FocusApp.getAccessControlToken('core.focusnet.eu');
+    var match = /^[^:]+:\s*(.+)$/.exec(header);
+    apikey = match[1];
+    window.FocusApp.init = init;
+} else {
+    document.addEventListener("DOMContentLoaded", function (event) {
+        var context = document.getElementsByTagName("body")[0].getAttribute("data-context");
+        apikey = document.getElementsByTagName("body")[0].getAttribute("data-api-key");
+        init(context);
+    });
 }
 
-function loadStand(url) {
-    var standrequest = new XMLHttpRequest();
-
-    standrequest.onreadystatechange = function() {
-        if (standrequest.readyState == 4 && standrequest.status == 200) {
-            var stand = factory.createStandData(JSON.parse(standrequest.responseText));
-            console.log("%o", stand);
-        }
+function loadData(url) {
+    // let's see what case we are dealing with
+    var split = url.split("/"), me = this;
+    switch (split[3]) {
+        case "forest":
+            console.log("forest");
+            data = new FocusRootData();
+            data.load(url).then(function (result) {
+                console.log(result);
+                me.initmap("forest");
+            });
+            break;
+        case "forest_data":
+            console.log("forest_data");
+            data = new FocusProjectData();
+            data.load(url).then(function (result) {
+                console.log(result);
+                me.initmap("forest_data");
+            });
+            break;
+        case "stand":
+            console.log("stand");
+            data = new FocusStandData();
+            data.load(url).then(function (result) {
+                console.log(result);
+                me.initmap("stand");
+            });
+            break;
+        default:
+            window.alert("Invalid url " + url);
+            break;
     }
-
-    standrequest.withCredentials = true;
-    standrequest.open("GET", url, true);
-    standrequest.send();
 }
 
-
-function initmap() {
+function initmap(datatype) {
     console.log("initmap");
+
+    var me = this;
 
     // set up the map
     map = new L.Map('map', {
@@ -130,7 +122,7 @@ function initmap() {
     });
     map.addControl(drawControl);
 
-    map.on('draw:created', function(e) {
+    map.on('draw:created', function (e) {
         var type = e.layerType,
             layer = e.layer;
 
@@ -139,65 +131,97 @@ function initmap() {
     });
 
     // in here you do whatever you want with the split output
-    map.on('merge:created', function(e) {
+    map.on('merge:created', function (e) {
         if (e.merge) {
             var result = e.merge;
-            result.eachLayer(function(layer) {
+            result.eachLayer(function (layer) {
                 drawnItems.addLayer(layer);
             });
         }
     });
 
     // in here you do whatever you want with merge output
-    map.on('split:created', function(e) {
+    map.on('split:created', function (e) {
         if (e.created) {
             var result = e.created;
-            result.eachLayer(function(layer) {
+            result.eachLayer(function (layer) {
                 console.log(layer);
-                layer.eachLayer(function(sublayer) {
+                layer.eachLayer(function (sublayer) {
                     sublayer.setStyle(shapeOptions);
                     drawnItems.addLayer(sublayer);
                 })
             });
         }
-    })
+    });
 
-    var projects = rootdata.getProjects();
 
-    for (var p = 0; p < projects.length; ++p) {
-        var project = projects[p];
-        var stands = project.getStands();
-        for (var s = 0; s < stands.length; ++s) {
-            var stand = stands[s];
+    switch (datatype) {
+        case "forest":
+            var projects = me.data.getProjects();
+
+            for (var p = 0; p < projects.length; ++p) {
+                var project = projects[p];
+                var stands = project.getStands();
+                for (var s = 0; s < stands.length; ++s) {
+                    var stand = stands[s];
+                    var geojson = stand.getGeoJSON();
+
+                    if (geojson != null) {
+                        var projGeoJSON = L.Proj.geoJson(geojson, shapeOptions).addTo(drawnItems);
+                        var data = stand.getData();
+                        projGeoJSON.bindPopup(createPopUp(data));
+                    }
+                }
+            }
+            break;
+        case "forest_data":
+            var stands = me.data.getStands();
+            for (var s = 0; s < stands.length; ++s) {
+                var stand = stands[s];
+                var geojson = stand.getGeoJSON();
+
+                if (geojson != null) {
+                    var projGeoJSON = L.Proj.geoJson(geojson, shapeOptions).addTo(drawnItems);
+                    var data = stand.getData();
+                    projGeoJSON.bindPopup(createPopUp(data));
+                }
+            }
+            break;
+        case "stand":
+            var stand = me.data;
             var geojson = stand.getGeoJSON();
 
             if (geojson != null) {
                 var projGeoJSON = L.Proj.geoJson(geojson, shapeOptions).addTo(drawnItems);
                 var data = stand.getData();
+                projGeoJSON.bindPopup(createPopUp(data));
+            }
 
-                var popupstr = "<table>";
+            break;
+    }
 
-                for (var property in data) {
-                    if (data.hasOwnProperty(property)) {
-                        if (property != "geojson") { // geojson is way too big attribute to dipslay so we skip it
+    map.fitBounds(drawnItems.getBounds());
+}
 
-                            var value = data[property];
+function createPopUp(data) {
+    var popupstr = "<table>";
 
-                            if (!isNaN(value)) {
-                                value = Math.round(value * 10) / 10;
-                            }
+    for (var property in data) {
+        if (data.hasOwnProperty(property)) {
+            if (property != "geojson") { // geojson is way too big attribute to dipslay so we skip it
 
-                            popupstr += "<tr><th>" + property + "</th><td>" + value + "</td></tr>";
-                        }
-                    }
+                var value = data[property];
+
+                if (!isNaN(value)) {
+                    value = Math.round(value * 10) / 10;
                 }
 
-                popupstr += "</table>";
-
-                projGeoJSON.bindPopup(popupstr);
+                popupstr += "<tr><th>" + property + "</th><td>" + value + "</td></tr>";
             }
         }
     }
 
-    map.fitBounds(drawnItems.getBounds());
+    popupstr += "</table>";
+
+    return popupstr;
 }
