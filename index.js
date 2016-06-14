@@ -1,7 +1,7 @@
 var map;
 var data;
 var apikey;
-var locationMarker = L.marker([51.5, -0.09])
+var locationMarker;
 
 function init(context) {
     console.log("init :: %o", context);
@@ -208,11 +208,30 @@ function initmap(datatype) {
 
 function initGeolocation() {
     console.log("initGeolocation");
+    locationMarker = L.marker([51.5, -0.09]);
+
     if (navigator.geolocation) {
         map.addLayer(locationMarker);
-        navigator.geolocation.watchPosition(updatePosition);
+        navigator.geolocation.watchPosition(updatePosition, geolocationError, {enableHighAccuracy: true});
     } else {
         console.warn("Geolocation is not supported by this browser.");
+    }
+}
+
+function geolocationError(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            console.warn("User denied the request for Geolocation.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            console.warn("Location information is unavailable.");
+            break;
+        case error.TIMEOUT:
+            console.warn("The request to get user location timed out.");
+            break;
+        case error.UNKNOWN_ERROR:
+            console.warn("An unknown error occurred.");
+            break;
     }
 }
 
