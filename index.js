@@ -1,6 +1,7 @@
 var map;
 var data;
 var apikey;
+var locationMarker = L.marker([51.5, -0.09])
 
 function init(context) {
     console.log("init :: %o", context);
@@ -201,6 +202,23 @@ function initmap(datatype) {
 
     var drawControl = new L.Control.Draw(drawOptions);
     map.addControl(drawControl);
+
+    this.initGeolocation();
+}
+
+function initGeolocation() {
+    console.log("initGeolocation");
+    if (navigator.geolocation) {
+        map.addLayer(locationMarker);
+        navigator.geolocation.watchPosition(updatePosition);
+    } else {
+        console.warn("Geolocation is not supported by this browser.");
+    }
+}
+
+function updatePosition(position) {
+    console.log("Latitude: " + position.coords.latitude + " Longitude: " + position.coords.longitude);
+    locationMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
 }
 
 function createPopUp(data) {
