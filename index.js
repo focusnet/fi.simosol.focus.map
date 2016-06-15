@@ -135,19 +135,15 @@ function initmap(datatype) {
         draw: {
             marker: false,
             circle: false,
-            polygon: {
-                allowIntersection: false,
-                showArea: true,
-                drawError: {
-                    color: '#b00b00',
-                    timeout: 1000
-                }
-            }
+            polygon: false,
+            rectangle: false
         },
         edit: {
             edit: false,
-            featureGroup: drawnItems,
-            remove: true
+            merge: true,
+            split: true,
+            remove: false,
+            featureGroup: drawnItems
         }
     };
 
@@ -171,7 +167,6 @@ function initmap(datatype) {
             }
             break;
         case "forest_data":
-            drawOptions.edit.merge = drawOptions.edit.split = true;
             var stands = me.data.getStands();
             for (var s = 0; s < stands.length; ++s) {
                 var stand = stands[s];
@@ -185,7 +180,6 @@ function initmap(datatype) {
             }
             break;
         case "stand":
-            drawOptions.edit = false;
             var stand = me.data;
             var geojson = stand.getGeoJSON();
 
