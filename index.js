@@ -121,6 +121,7 @@ function initmap(datatype) {
             var result = e.created;
             result.eachLayer(function (layer) {
                 console.log(layer);
+                layer.bindPopup(createPopUp(layer.focusdata.getData()));
                 layer.eachLayer(function (sublayer) {
                     sublayer.setStyle(shapeOptions);
                     drawnItems.addLayer(sublayer);
@@ -160,8 +161,7 @@ function initmap(datatype) {
 
                     if (geojson != null) {
                         var projGeoJSON = L.Proj.geoJson(geojson, shapeOptions).addTo(drawnItems);
-                        var data = stand.getData();
-                        projGeoJSON.bindPopup(createPopUp(data));
+                        projGeoJSON.bindPopup(createPopUp(stand.getData()));
                     }
                 }
             }
@@ -174,8 +174,8 @@ function initmap(datatype) {
 
                 if (geojson != null) {
                     var projGeoJSON = L.Proj.geoJson(geojson, shapeOptions).addTo(drawnItems);
-                    var data = stand.getData();
-                    projGeoJSON.bindPopup(createPopUp(data));
+                    projGeoJSON.focusdata = stand;
+                    projGeoJSON.bindPopup(createPopUp(stand.getData()));
                 }
             }
             break;
@@ -185,8 +185,7 @@ function initmap(datatype) {
 
             if (geojson != null) {
                 var projGeoJSON = L.Proj.geoJson(geojson, shapeOptions).addTo(drawnItems);
-                var data = stand.getData();
-                projGeoJSON.bindPopup(createPopUp(data));
+                projGeoJSON.bindPopup(createPopUp(stand.getData()));
             }
 
             break;

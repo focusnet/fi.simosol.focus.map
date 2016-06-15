@@ -25,7 +25,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         zIndexOffset: 2000
     },
 
-    initialize: function(map, options) {
+    initialize: function (map, options) {
         console.log("INITIALIZE");
 
         if (L.Browser.touch) {
@@ -45,7 +45,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         this.type = "split";
     },
 
-    addHooks: function() {
+    addHooks: function () {
         console.log("ADDHOOKS");
 
         L.Draw.Feature.prototype.addHooks.call(this);
@@ -89,13 +89,13 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
 
             var me = this;
 
-            this._splittableLayers.eachLayer(function(layer) {
+            this._splittableLayers.eachLayer(function (layer) {
                 layer.on('click', me._onTouch, me);
             });
         }
     },
 
-    removeHooks: function() {
+    removeHooks: function () {
         console.log("REMOVEHOOKS");
 
         L.Draw.Feature.prototype.removeHooks.call(this);
@@ -125,7 +125,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
             .off('click', this._onTouch, this);
     },
 
-    save: function() {
+    save: function () {
         console.log("SAVE");
         this._map.fire('split:created', {
             created: this._splittedPolygons
@@ -133,11 +133,11 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         //  this._map.removeLayer(this._splittedPolygons);
     },
 
-    revertLayers: function() {
+    revertLayers: function () {
         console.log("REVERTLAYERS");
     },
 
-    enable: function() {
+    enable: function () {
         console.log("ENABLE");
 
         var me = this;
@@ -149,14 +149,14 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         this._backup = [];
 
 
-        this._splittableLayers.eachLayer(function(layer) {
+        this._splittableLayers.eachLayer(function (layer) {
             me._backup.push(layer);
         });
 
         L.Handler.prototype.enable.call(this);
     },
 
-    disable: function() {
+    disable: function () {
         console.log("DISABLE");
 
         L.Handler.prototype.disable.call(this);
@@ -166,7 +166,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         });
     },
 
-    addVertex: function(latlng) {
+    addVertex: function (latlng) {
         var markersLength = this._markers.length;
 
         if (markersLength > 0 && !this.options.allowIntersection && this._poly.newLatLngIntersects(latlng)) {
@@ -187,16 +187,18 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         this._vertexChanged(latlng, true);
     },
 
-    cut: function(polygons, blade) {
+    cut: function (polygons, blade) {
         if (blade && polygons.length > 0) {
             for (var i = 0; i < polygons.length; ++i) {
                 var result = this.split(polygons[i], blade);
-                this._splittedPolygons.addLayer(L.geoJson(result));
+                var layer = L.geoJson(result.geojson);
+                layer.focusdata = result.focusdata;
+                this._splittedPolygons.addLayer(layer);
             }
         }
     },
 
-    _showErrorTooltip: function() {
+    _showErrorTooltip: function () {
         this._errorShown = true;
 
         // Update tooltip
@@ -217,7 +219,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         this._hideErrorTimeout = setTimeout(L.Util.bind(this._hideErrorTooltip, this), this.options.drawError.timeout);
     },
 
-    _hideErrorTooltip: function() {
+    _hideErrorTooltip: function () {
         this._errorShown = false;
 
         this._clearHideErrorTimeout();
@@ -234,7 +236,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         });
     },
 
-    split: function(polygon, blade) {
+    split: function (polygon, blade) {
         var me = this;
         var reader = new jsts.io.GeoJSONReader();
 
@@ -267,7 +269,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         var polygons = polygonizer.getPolygons();
         var me = this;
 
-        polygons.a.forEach(function(poly) {
+        polygons.a.forEach(function (poly) {
             var p = me._polygon2geonjson(poly);
 
             // let's cut interior rings if there was any
@@ -280,10 +282,10 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
             output.features.push(p);
         });
 
-        return output;
+        return {geojson: output, focusdata: polygon.focusdata};
     },
 
-    _polygon2geonjson: function(polygon) {
+    _polygon2geonjson: function (polygon) {
         writer = new jsts.io.GeoJSONWriter();
         var f = {
             type: "Feature",
@@ -294,7 +296,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         return f;
     },
 
-    _polygon2linestring: function(polygon) {
+    _polygon2linestring: function (polygon) {
         var polygonLine = {
             "type": "Feature",
             "properties": {},
@@ -313,7 +315,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         return polygonLine;
     },
 
-    _createMarker: function(latlng) {
+    _createMarker: function (latlng) {
         var marker = new L.Marker(latlng, {
             icon: this.options.icon,
             zIndexOffset: this.options.zIndexOffset * 2
@@ -324,11 +326,11 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         return marker;
     },
 
-    _drawGuide: function(pointA, pointB) {
+    _drawGuide: function (pointA, pointB) {
         var length = Math.floor(Math.sqrt(Math.pow((pointB.x - pointA.x), 2) + Math.pow((pointB.y - pointA.y), 2))),
             guidelineDistance = this.options.guidelineDistance,
             maxGuideLineLength = this.options.maxGuideLineLength,
-            // Only draw a guideline with a max length
+        // Only draw a guideline with a max length
             i = length > maxGuideLineLength ? length - maxGuideLineLength : guidelineDistance,
             fraction,
             dashPoint,
@@ -358,7 +360,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         }
     },
 
-    _updateFinishHandler: function() {
+    _updateFinishHandler: function () {
         var markerCount = this._markers.length;
         // The last marker should have a click handler to close the polyline
         if (markerCount > 1) {
@@ -371,7 +373,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         }
     },
 
-    _updateRunningMeasure: function(latlng, added) {
+    _updateRunningMeasure: function (latlng, added) {
         var markersLength = this._markers.length,
             previousMarkerIndex, distance;
 
@@ -385,7 +387,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         }
     },
 
-    _vertexChanged: function(latlng, added) {
+    _vertexChanged: function (latlng, added) {
         this._map.fire('draw:drawvertex', {
             layers: this._markerGroup
         });
@@ -398,7 +400,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         this._updateTooltip();
     },
 
-    _finishShape: function() {
+    _finishShape: function () {
         console.log("FINISHSHAPE");
 
         var me = this;
@@ -408,10 +410,12 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
 
         var polygons = [];
 
-        this._splittableLayers.eachLayer(function(layer) {
+        this._splittableLayers.eachLayer(function (layer) {
             me.options.featureGroup.removeLayer(layer);
             var layerGeoJSON = layer.toGeoJSON();
-            polygons = polygons.concat(me._getPolygons(layerGeoJSON));
+
+            layerGeoJSON.focusdata = layer.focusdata;
+            polygons = polygons.concat(me._getPolygons(layerGeoJSON, layer.focusdata));
         });
 
         this.cut(polygons, blade);
@@ -423,7 +427,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         this.disable();
     },
 
-    _getPolygons: function(layer) {
+    _getPolygons: function (layer, focusdata) {
         console.log(layer.type);
 
         var me = this;
@@ -432,16 +436,17 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
 
         if (layer.type == "FeatureCollection") {
             for (var i = 0; i < layer.features.length; ++i) {
-                result = result.concat(me._getPolygons(layer.features[i]));
+                result = result.concat(me._getPolygons(layer.features[i], layer.focusdata));
             }
         } else if (layer.type == "Feature" && layer.geometry.type == "Polygon") {
+            layer.focusdata = focusdata;
             result.push(layer);
         }
 
         return result;
     },
 
-    _onMouseUp: function(e) {
+    _onMouseUp: function (e) {
         console.log("MOUSEUP");
         if (this._mouseDownOrigin) {
             // We detect clicks within a certain tolerance, otherwise let it
@@ -455,13 +460,13 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         this._mouseDownOrigin = null;
     },
 
-    _onMouseDown: function(e) {
+    _onMouseDown: function (e) {
         console.log("MOUSEDOWN");
         var originalEvent = e.originalEvent;
         this._mouseDownOrigin = L.point(originalEvent.clientX, originalEvent.clientY);
     },
 
-    _onTouch: function(e) {
+    _onTouch: function (e) {
         console.log("ONTOUCH");
 
         if (L.Browser.touch) { // #TODO: get rid of this once leaflet fixes their click/touch.
@@ -471,11 +476,11 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         }
     },
 
-    _onMouseOut: function() {
+    _onMouseOut: function () {
         // console.log("ONMOUSEOUT");
     },
 
-    _onMouseMove: function(e) {
+    _onMouseMove: function (e) {
         var newPos = this._map.mouseEventToLayerPoint(e.originalEvent);
         var latlng = this._map.layerPointToLatLng(newPos);
 
@@ -494,11 +499,11 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         L.DomEvent.preventDefault(e.originalEvent);
     },
 
-    _onZoomEnd: function() {
+    _onZoomEnd: function () {
 
     },
 
-    _updateTooltip: function(latLng) {
+    _updateTooltip: function (latLng) {
         var text = this._getTooltipText();
 
         if (latLng) {
@@ -510,7 +515,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         }
     },
 
-    _getTooltipText: function() {
+    _getTooltipText: function () {
         var showLength = this.options.showLength,
             labelText, distanceStr;
 
@@ -536,7 +541,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
         return labelText;
     },
 
-    _updateGuide: function(newPos) {
+    _updateGuide: function (newPos) {
         var markerCount = this._markers.length;
 
         if (markerCount > 0) {
@@ -552,7 +557,7 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
     },
 
     // removes all child elements (guide dashes) from the guides container
-    _clearGuides: function() {
+    _clearGuides: function () {
         if (this._guidesContainer) {
             while (this._guidesContainer.firstChild) {
                 this._guidesContainer.removeChild(this._guidesContainer.firstChild);
