@@ -30,7 +30,9 @@ var STAND_PROPERTIES_ORDER = [
  * List of properties to exclude from the popup
  */
 var STAND_PROPERTIES_TO_EXCLUDE = [
-    "geojson"
+    "geojson",
+    "operation_urls",
+    "uid"
 ];
 
 /**
@@ -302,6 +304,8 @@ function updatePosition(position) {
  *
  * @param data
  * @returns {string}
+ *
+ * FIXME TODO could be better modularized and cleaner.
  */
 function createPopUp(data) {
     var popupstr = "<table>";
@@ -314,6 +318,10 @@ function createPopUp(data) {
             label = STAND_LABELS.hasOwnProperty(k) ? STAND_LABELS[k] : k;
             if (data.hasOwnProperty(k)) {
                 value = data[k];
+                var v2 = (""+value).substring(0, 20);
+                if (v2 != ""+value) {
+                    value = v2 + "...";
+                }
                 if (!isNaN(value)) {
                     value = Math.round(value * 10) / 10;
                 }
@@ -336,6 +344,10 @@ function createPopUp(data) {
         if (data.hasOwnProperty(prop)) {
             label = STAND_LABELS.hasOwnProperty(prop) ? STAND_LABELS[prop] : prop;
             value = data[prop];
+            var v2 = (""+value).substring(0, 20);
+            if (v2 != (""+value)) {
+                value = v2 + "...";
+            }
             if (!isNaN(value)) {
                 value = Math.round(value * 10) / 10;
             }
