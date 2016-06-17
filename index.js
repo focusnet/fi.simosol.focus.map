@@ -192,12 +192,7 @@ function initmap(datatype) {
 
     var drawOptions = {
         position: 'topright',
-        draw: {
-            marker: false,
-            circle: false,
-            polygon: false,
-            rectangle: false
-        },
+        draw: false,
         edit: {
             edit: false,
             merge: true,
