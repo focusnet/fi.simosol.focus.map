@@ -192,11 +192,15 @@
 }
 
 .leaflet-draw-toolbar .leaflet-draw-edit-split {
-	background-position: -300px -0px;
+	background-position: -301px -1px;
 }
 
 .leaflet-draw-toolbar .leaflet-draw-edit-merge {
-	background-position: -270px -0px;
+	background-position: -272px -2px;
+}
+
+.leaflet-draw-toolbar .leaflet-draw-edit-geosplit {
+	background-position: -332px -2px;
 }
 
 .leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-remove {

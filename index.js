@@ -143,6 +143,7 @@ function initmap(datatype) {
             edit: false,
             merge: true,
             split: true,
+            geosplit: true,
             remove: false,
             featureGroup: drawnItems
         }
