@@ -140,6 +140,8 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
     enable: function () {
         console.log("ENABLE");
 
+        popupsEnabled = false;
+
         var me = this;
 
         this.fire("enabled", {
@@ -158,6 +160,8 @@ L.EditToolbar.Split = L.Draw.Feature.extend({
 
     disable: function () {
         console.log("DISABLE");
+
+        popupsEnabled = true;
 
         L.Handler.prototype.disable.call(this);
 

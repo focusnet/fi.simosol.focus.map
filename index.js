@@ -2,6 +2,7 @@ var map;
 var data;
 var apikey;
 var locationMarker;
+var popupsEnabled = true;
 
 /**
  * Defines the order in which properties will be displayed in the
@@ -180,7 +181,7 @@ function initmap(datatype) {
             var result = e.created;
             result.eachLayer(function (layer) {
                 console.log(layer);
-                layer.bindPopup(createPopUp(layer.focusdata.getData()));
+                // layer.bindPopup(createPopUp(layer.focusdata.getData()));
                 layer.eachLayer(function (sublayer) {
                     sublayer.setStyle(shapeOptions);
                     drawnItems.addLayer(sublayer);
@@ -188,7 +189,6 @@ function initmap(datatype) {
             });
         }
     });
-
 
     var drawOptions = {
         position: 'topright',
@@ -221,7 +221,6 @@ function initmap(datatype) {
 
                     if (geojson != null) {
                         var projGeoJSON = L.Proj.geoJson(geojson, shapeOptions).addTo(drawnItems);
-                        projGeoJSON.bindPopup(createPopUp(stand.getData()));
                     }
                 }
             }
@@ -235,7 +234,7 @@ function initmap(datatype) {
                 if (geojson != null) {
                     var projGeoJSON = L.Proj.geoJson(geojson, shapeOptions).addTo(drawnItems);
                     projGeoJSON.focusdata = stand;
-                    projGeoJSON.bindPopup(createPopUp(stand.getData()));
+                    projGeoJSON.on('click', onClick);
                 }
             }
             break;
@@ -245,7 +244,6 @@ function initmap(datatype) {
 
             if (geojson != null) {
                 var projGeoJSON = L.Proj.geoJson(geojson, shapeOptions).addTo(drawnItems);
-                projGeoJSON.bindPopup(createPopUp(stand.getData()));
             }
 
             break;
@@ -285,6 +283,21 @@ function geolocationError(error) {
         case error.UNKNOWN_ERROR:
             console.warn("An unknown error occurred.");
             break;
+    }
+}
+
+function onClick(event) {
+    console.log("CLICK!!!");
+    if (popupsEnabled) {
+        var target = event.target;
+
+        if (target.hasOwnProperty("focusdata")) {
+            var bounds = target.getBounds();
+            var center = bounds.getCenter();
+
+            var popup = createPopUp(event.target.focusdata.getData());
+            map.openPopup(popup, center);
+        }
     }
 }
 
@@ -352,7 +365,6 @@ function createPopUp(data) {
             popupstr += "<tr><th>" + label + "</th><td>" + value + "</td></tr>\n";
         }
     }
-
 
     popupstr += "</table>";
 

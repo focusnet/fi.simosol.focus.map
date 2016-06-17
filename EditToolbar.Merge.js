@@ -36,6 +36,8 @@ L.EditToolbar.Merge = L.Handler.extend({
     enable: function() {
         console.log("ENABLE");
 
+        popupsEnabled = false;
+
         this.fire("enabled", {
             handler: this.type
         });
@@ -49,6 +51,9 @@ L.EditToolbar.Merge = L.Handler.extend({
 
     disable: function() {
         console.log("DISABLE");
+
+        popupsEnabled = true;
+
         if (!this._enabled) {
             return;
         }
@@ -94,6 +99,7 @@ L.EditToolbar.Merge = L.Handler.extend({
         this._selectedLayers.eachLayer(function(layer) {
             me._mergeableLayers.removeLayer(layer);
             me._selectedLayers.removeLayer(layer);
+            map.removeLayer(layer);
         });
 
         this._map.fire('merge:created', {
