@@ -3,6 +3,66 @@ var data;
 var apikey;
 var locationMarker;
 
+/**
+ * Defines the order in which properties will be displayed in the
+ * popup
+ */
+var STAND_PROPERTIES_ORDER = [
+    "G",
+    "N",
+    "V",
+    "Dd",
+    "Hd",
+    "D",
+    "PRFI",
+    "PRTA",
+    "PRFO",
+    "PRLA",
+    "PRAN",
+    "PRBU",
+    "PREI",
+    "PREA",
+    "PRAH",
+    "PRAL"
+];
+
+/**
+ * List of properties to exclude from the popup
+ */
+var STAND_PROPERTIES_TO_EXCLUDE = [
+    "geojson",
+    "operation_urls",
+    "uid"
+];
+
+/**
+ * Defines labels for the properties to be displayed in the popup.
+ */
+var STAND_LABELS = {
+    "Hd": "hdom",
+    "Dd": "ddom",
+    "inventoryDate": "Inventory date",
+    "area": "Stand area (ha)",
+    "D": "DG (cm)",
+    "N": "Number of stems per ha",
+    "V": "Growing stock (m3/ha)",
+    "canopyCover": "Degree of canopy cover (%)",
+    "structure": "Stand basic structure (1 = even-aged; 2 = uneven aged)",
+    "G": "Basal area (m2/ha)",
+    "PRAN": "Percentage of coniferous (%G)",
+    "PREA": "Percentage of ash (%G)",
+    "PRBU": "Percentage of beech (%G)",
+    "PRFO": "Percentage of scots pine (%G)",
+    "PRAL": "Percentage of other hardwood (%G)",
+    "PRAH": "Percentage of maple (%G)",
+    "PRFI": "Percentage of spruce (%G)",
+    "PRLA": "Percentage of larch (%G)",
+    "PREI": "Percentage of oak (%G)",
+    "PRTA": "Percentage of silver fir (%G)"
+};
+
+
+
 function init(context) {
     console.log("init :: %o", context);
 
@@ -234,23 +294,68 @@ function updatePosition(position) {
     locationMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
 }
 
+
+/**
+ * Create the HTML to include in the popup.
+ *
+ * The entries are order according to STAND_PROPERTIES_ORDER and take their labels
+ * from STAND_LABELS. Properties without order are appended to the end of the list,
+ * if they are not in the STAND_PROPERTIES_TO_EXCLUDE array. If no label can be found,
+ * the property name is used instead.
+ *
+ * @param data
+ * @returns {string}
+ *
+ * FIXME TODO could be better modularized and cleaner.
+ */
 function createPopUp(data) {
     var popupstr = "<table>";
 
-    for (var property in data) {
-        if (data.hasOwnProperty(property)) {
-            if (property != "geojson") { // geojson is way too big attribute to dipslay so we skip it
-
-                var value = data[property];
-
+    var label, value;
+    var alreadySeen = [];
+    for(var len = STAND_PROPERTIES_ORDER.length, i = 0; i < len; ++i) {
+        if (i in STAND_PROPERTIES_ORDER) {
+            var k = STAND_PROPERTIES_ORDER[i];
+            label = STAND_LABELS.hasOwnProperty(k) ? STAND_LABELS[k] : k;
+            if (data.hasOwnProperty(k)) {
+                value = data[k];
+                var v2 = (""+value).substring(0, 20);
+                if (v2 != ""+value) {
+                    value = v2 + "...";
+                }
                 if (!isNaN(value)) {
                     value = Math.round(value * 10) / 10;
                 }
-
-                popupstr += "<tr><th>" + property + "</th><td>" + value + "</td></tr>";
+                popupstr += "<tr><th>" + label + "</th><td>" + value + "</td></tr>\n";
             }
+            else {
+                popupstr += "<tr><th>" + label + "</th><td>N/A</td></tr>\n";
+            }
+            alreadySeen[k] = true;
         }
     }
+
+    for(var prop in data) {
+        if (alreadySeen.hasOwnProperty(prop) && alreadySeen[prop]) {
+            continue;
+        }
+        if (STAND_PROPERTIES_TO_EXCLUDE.indexOf(prop) != -1) {
+            continue;
+        }
+        if (data.hasOwnProperty(prop)) {
+            label = STAND_LABELS.hasOwnProperty(prop) ? STAND_LABELS[prop] : prop;
+            value = data[prop];
+            var v2 = (""+value).substring(0, 20);
+            if (v2 != (""+value)) {
+                value = v2 + "...";
+            }
+            if (!isNaN(value)) {
+                value = Math.round(value * 10) / 10;
+            }
+            popupstr += "<tr><th>" + label + "</th><td>" + value + "</td></tr>\n";
+        }
+    }
+
 
     popupstr += "</table>";
 
