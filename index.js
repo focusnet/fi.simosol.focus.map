@@ -62,7 +62,6 @@ var STAND_LABELS = {
 };
 
 
-
 function init(context) {
     console.log("init :: %o", context);
 
@@ -290,10 +289,8 @@ function geolocationError(error) {
 }
 
 function updatePosition(position) {
-    console.log("Latitude: " + position.coords.latitude + " Longitude: " + position.coords.longitude);
     locationMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
 }
-
 
 /**
  * Create the HTML to include in the popup.
@@ -313,14 +310,14 @@ function createPopUp(data) {
 
     var label, value;
     var alreadySeen = [];
-    for(var len = STAND_PROPERTIES_ORDER.length, i = 0; i < len; ++i) {
+    for (var len = STAND_PROPERTIES_ORDER.length, i = 0; i < len; ++i) {
         if (i in STAND_PROPERTIES_ORDER) {
             var k = STAND_PROPERTIES_ORDER[i];
             label = STAND_LABELS.hasOwnProperty(k) ? STAND_LABELS[k] : k;
             if (data.hasOwnProperty(k)) {
                 value = data[k];
-                var v2 = (""+value).substring(0, 20);
-                if (v2 != ""+value) {
+                var v2 = ("" + value).substring(0, 20);
+                if (v2 != "" + value) {
                     value = v2 + "...";
                 }
                 if (!isNaN(value)) {
@@ -335,7 +332,7 @@ function createPopUp(data) {
         }
     }
 
-    for(var prop in data) {
+    for (var prop in data) {
         if (alreadySeen.hasOwnProperty(prop) && alreadySeen[prop]) {
             continue;
         }
@@ -345,8 +342,8 @@ function createPopUp(data) {
         if (data.hasOwnProperty(prop)) {
             label = STAND_LABELS.hasOwnProperty(prop) ? STAND_LABELS[prop] : prop;
             value = data[prop];
-            var v2 = (""+value).substring(0, 20);
-            if (v2 != (""+value)) {
+            var v2 = ("" + value).substring(0, 20);
+            if (v2 != ("" + value)) {
                 value = v2 + "...";
             }
             if (!isNaN(value)) {
