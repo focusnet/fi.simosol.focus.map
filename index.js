@@ -40,14 +40,14 @@ var STAND_PROPERTIES_TO_EXCLUDE = [
  * Defines labels for the properties to be displayed in the popup.
  */
 var STAND_LABELS = {
-    "Hd": "hdom",
-    "Dd": "ddom",
+    "Hd": "hdom (cm)",
+    "Dd": "ddom (cm)",
     "inventoryDate": "Inventory date",
     "area": "Stand area (ha)",
-    "D": "DG (cm)",
-    "N": "Number of stems per ha",
-    "V": "Growing stock (m3/ha)",
+    "D": "dg (cm)",
     "canopyCover": "Degree of canopy cover (%)",
+    "N": "Number of stems (-/ha)",
+    "V": "Growing stock (m3/ha)",
     "structure": "Stand basic structure (1 = even-aged; 2 = uneven aged)",
     "G": "Basal area (m2/ha)",
     "PRAN": "Percentage of coniferous (%G)",
