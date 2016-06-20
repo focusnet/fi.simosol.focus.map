@@ -288,7 +288,6 @@ function geolocationError(error) {
 }
 
 function onClick(event) {
-    console.log("CLICK!!!");
     if (popupsEnabled) {
         var target = event.target;
 
