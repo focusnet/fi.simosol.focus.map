@@ -13,12 +13,22 @@ L.EditToolbar.Merge = L.Handler.extend({
             fillColor: null, //same as color by default
             fillOpacity: 0.2,
             clickable: true
+        },
+        selectedShapeOptions: {
+            stroke: true,
+            color: '#0228ff',
+            weight: 4,
+            opacity: 0.5,
+            fill: true,
+            fillColor: null, //same as color by default
+            fillOpacity: 0.2,
+            clickable: true
         }
     },
 
     includes: L.Mixin.Events,
 
-    initialize: function(map, options) {
+    initialize: function (map, options) {
         L.Handler.prototype.initialize.call(this, map);
 
         L.Util.setOptions(this, options);
@@ -33,7 +43,7 @@ L.EditToolbar.Merge = L.Handler.extend({
         this.type = "merge";
     },
 
-    enable: function() {
+    enable: function () {
         console.log("ENABLE");
 
         popupsEnabled = false;
@@ -49,7 +59,7 @@ L.EditToolbar.Merge = L.Handler.extend({
         L.Handler.prototype.enable.call(this);
     },
 
-    disable: function() {
+    disable: function () {
         console.log("DISABLE");
 
         popupsEnabled = true;
@@ -69,7 +79,7 @@ L.EditToolbar.Merge = L.Handler.extend({
         });
     },
 
-    addHooks: function() {
+    addHooks: function () {
         console.log("ADDHOOKS");
 
         var map = this._map;
@@ -81,7 +91,7 @@ L.EditToolbar.Merge = L.Handler.extend({
         }
     },
 
-    removeHooks: function() {
+    removeHooks: function () {
         console.log("REMOVEHOOKS");
         if (this._map) {
             this._mergeableLayers.eachLayer(this._disableLayerMerge, this);
@@ -89,14 +99,14 @@ L.EditToolbar.Merge = L.Handler.extend({
         }
     },
 
-    save: function() {
+    save: function () {
         console.log("SAVE");
         var me = this,
             merged = L.geoJson(turf.merge(this._selectedLayers.toGeoJSON()));
 
         merged.setStyle(this.options.shapeOptions);
 
-        this._selectedLayers.eachLayer(function(layer) {
+        this._selectedLayers.eachLayer(function (layer) {
             me._mergeableLayers.removeLayer(layer);
             me._selectedLayers.removeLayer(layer);
             map.removeLayer(layer);
@@ -107,18 +117,18 @@ L.EditToolbar.Merge = L.Handler.extend({
         });
     },
 
-    revertLayers: function() {
+    revertLayers: function () {
         console.log("REVERTLAYERS");
         this._deselectAll();
     },
 
-    _enableLayerMerge: function(e) {
+    _enableLayerMerge: function (e) {
         console.log("ENABLELAYERMERGE");
         var layer = e.layer || e.target || e;
         layer.on('click', this._addToBeMerged, this);
 
         if (this.options.selectedPathOptions) {
-            pathOptions = L.Util.extend({}, this.options.selectedPathOptions);
+            pathOptions = L.Util.extend({}, this.options.selectedShapeOptions);
 
             pathOptions.color = layer.options.color;
             pathOptions.fillColor = layer.options.fillColor;
@@ -128,7 +138,7 @@ L.EditToolbar.Merge = L.Handler.extend({
         }
     },
 
-    _disableLayerMerge: function(e) {
+    _disableLayerMerge: function (e) {
         var layer = e.layer || e.target || e;
 
         layer.off('click', this._addToBeMerged, this);
@@ -137,22 +147,22 @@ L.EditToolbar.Merge = L.Handler.extend({
         this._selectedLayers.removeLayer(layer);
     },
 
-    _addToBeMerged: function(e) {
+    _addToBeMerged: function (e) {
         console.log("ADDTOBEMERGED");
         var layer = e.layer || e.target || e;
 
         layer.addTo(this._selectedLayers);
-        layer.setStyle(this.options.selectedPathOptions);
+        layer.setStyle(this.options.selectedShapeOptions);
     },
 
-    _deselectAll: function() {
+    _deselectAll: function () {
         var me = this;
-        this._selectedLayers.eachLayer(function(layer) {
+        this._selectedLayers.eachLayer(function (layer) {
             me._deselect(layer);
         });
     },
 
-    _deselect: function(layer) {
+    _deselect: function (layer) {
         layer.setStyle(layer.options.original);
     }
 });
