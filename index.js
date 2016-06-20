@@ -216,6 +216,8 @@ function initmap(datatype) {
 
                     if (geojson != null) {
                         var projGeoJSON = L.Proj.geoJson(geojson, shapeOptions).addTo(drawnItems);
+                        projGeoJSON.focusdata = stand;
+                        projGeoJSON.on('click', onClick);
                     }
                 }
             }
