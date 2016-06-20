@@ -68,8 +68,7 @@ function init(context) {
 
     if (!apikey) {
         window.alert("You must provide apikey within the code!");
-    }
-    else {
+    } else {
         loadData(context);
     }
 }
@@ -124,6 +123,9 @@ function loadData(url) {
 
 function initmap(datatype) {
     console.log("initmap");
+
+    var elem = document.getElementById("progressdiv");
+    elem.parentNode.removeChild(elem);
 
     var me = this;
 

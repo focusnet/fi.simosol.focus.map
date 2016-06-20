@@ -8,3 +8,16 @@ html, body, #map {
     height: 50vw;
     width: 100vw;
 }
+
+#progressdiv {
+    height: 100%;
+    width: 100%;
+}
+
+#progressbar {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    /* bring your own prefixes */
+    transform: translate(-50%, -50%);
+}
