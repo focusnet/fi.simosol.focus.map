@@ -29,7 +29,7 @@
 
 .leaflet-retina .leaflet-draw-toolbar a {
 	background-image: url('images/spritesheet-2x.png');
-	background-size: 330px 30px;
+	background-size: 360px 30px;
 }
 
 .leaflet-draw a {
@@ -196,11 +196,11 @@
 }
 
 .leaflet-draw-toolbar .leaflet-draw-edit-merge {
-	background-position: -272px -2px;
+	background-position: -270px 0px;
 }
 
 .leaflet-draw-toolbar .leaflet-draw-edit-geosplit {
-	background-position: -332px -2px;
+	background-position: -330px 0px;
 }
 
 .leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-remove {
