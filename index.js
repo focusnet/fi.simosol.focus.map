@@ -3,6 +3,8 @@ var data;
 var apikey;
 var locationMarker;
 var popupsEnabled = true;
+var total = 0;
+var progress = 0;
 
 /**
  * Defines the order in which properties will be displayed in the
@@ -66,12 +68,25 @@ var STAND_LABELS = {
 function init(context) {
     console.log("init :: %o", context);
 
+    document.addEventListener('progress', onProgress);
+
     if (!apikey) {
         window.alert("You must provide apikey within the code!");
     } else {
         loadData(context);
     }
 }
+
+function onProgress(event) {
+    console.log("EVENT!");
+
+    var progressbar = document.getElementById('progressbar');
+
+    if(progressbar) {
+        progressbar.value = event.detail * 100;
+    }
+}
+
 
 // Do we run the webbapp from FOCUS, or do we want to display a demo in the browser?
 if (window.FocusApp) {

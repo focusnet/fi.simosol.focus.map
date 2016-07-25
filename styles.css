@@ -81,3 +81,10 @@ html, body, #map {
         height: 5em;
     }
 }
+
+progress {
+    border: 0;
+    height: 50px;
+    width:100%;
+}
+

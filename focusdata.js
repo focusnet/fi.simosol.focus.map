@@ -291,6 +291,10 @@ var FocusProjectData = FocusData.extend(function () {
                         }
                         queueDone++;
 
+                        var event = new CustomEvent('progress', {'detail': queueDone / standURLs.length });
+
+                        document.dispatchEvent(event);
+
                         if (queueDone == standURLs.length) {
                             resolve("all stands loaded succesfully")
                         }
