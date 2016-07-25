@@ -83,8 +83,12 @@ function onProgress(event) {
     var progressbar = document.getElementById('progressbar');
 
     if(progressbar) {
-        progressbar.value = event.detail * 100;
+        progressbar.className = "c100 p" + Math.round(event.detail * 100);
+
     }
+
+    var progresstext = document.getElementById('progresstext');
+    progresstext.textContent = Math.round(event.detail * 100) + "%";
 }
 
 

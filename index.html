@@ -12,6 +12,8 @@
     <!-- custom leaflet.draw styling :: adds merge and split gfx -->
     <link rel="stylesheet" type="text/css" href="leaflet-draw/leaflet.draw-simosol.css"/>
 
+    <link rel="stylesheet" type="text/css" href="circle.css"/>
+
     <script src="extend.min.js"></script>
 
     <script src="focusdata.js"></script>
@@ -46,9 +48,14 @@
 
 <div id="progressdiv">
 
-    <progress id="progressbar" value="0" max="100" width="100%"></progress>
+    <div id="progressbar" class="c100 p0">
+        <span id="progresstext">0%</span>
+        <div class="slice">
+            <div class="bar"></div>
+            <div class="fill"></div>
+        </div>
+    </div>
 
-    <div class="loader">Loading...</div>
 </div>
 
 <div id="map"></div>
