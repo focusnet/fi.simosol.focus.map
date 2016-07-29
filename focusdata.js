@@ -186,6 +186,8 @@ var FocusRootData = FocusData.extend(function () {
             if (data.hasOwnProperty('project_urls')) {
                 var projectURLs = data['project_urls'];
 
+                total += projectURLs.length;
+
                 console.log("Loading " + projectURLs.length + " projects...");
 
                 for (var i = 0; i < projectURLs.length; ++i) {
@@ -193,6 +195,10 @@ var FocusRootData = FocusData.extend(function () {
                     loadProject(url).then(function (content) {
                         projects.push(content);
                         queueDone++;
+                        progress++;
+
+                        var event = new CustomEvent('progress', {'detail': progress / total });
+                        document.dispatchEvent(event);
 
                         if (queueDone == projectURLs.length) {
                             resolve("all projects loaded succesfully")
@@ -219,6 +225,7 @@ var FocusRootData = FocusData.extend(function () {
                         project.fromJSON(JSON.parse(xmlhttp.responseText));
 
                         project.loadStands().then(function (content) {
+                            progress++;
                             console.log(content);
                             resolve(project);
                         })
@@ -283,6 +290,8 @@ var FocusProjectData = FocusData.extend(function () {
 
                 console.log("Loading " + standURLs.length + " stands...");
 
+                total += standURLs.length;
+
                 for (var i = 0; i < standURLs.length; ++i) {
                     var url = standURLs[i];
                     loadStand(url).then(function (content) {
@@ -290,9 +299,9 @@ var FocusProjectData = FocusData.extend(function () {
                             stands.push(content);
                         }
                         queueDone++;
+                        progress++;
 
-                        var event = new CustomEvent('progress', {'detail': queueDone / standURLs.length });
-
+                        var event = new CustomEvent('progress', {'detail': progress / total });
                         document.dispatchEvent(event);
 
                         if (queueDone == standURLs.length) {

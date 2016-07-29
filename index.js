@@ -78,8 +78,6 @@ function init(context) {
 }
 
 function onProgress(event) {
-    console.log("EVENT!");
-
     var progressbar = document.getElementById('progressbar');
 
     if(progressbar) {
